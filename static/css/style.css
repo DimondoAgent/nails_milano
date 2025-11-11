@@ -310,6 +310,7 @@ img {
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-medium);
     transition: box-shadow 0.3s ease;
+    cursor: pointer;
 }
 .gallery-item:hover {
     box-shadow: var(--shadow-hover);
@@ -484,4 +485,119 @@ img {
 
 @media (max-width: 480px) {
     .gallery-grid { grid-template-columns: 1fr; }
+}
+
+/* =======================================
+   8. МОДАЛЬНОЕ ОКНО ГАЛЕРЕИ (НОВОЕ)
+   ======================================= */
+
+.modal-overlay {
+    /* 1. Скрыто по умолчанию */
+    display: none; 
+    
+    /* 2. Позиционирование (поверх всего) */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* 3. Фон */
+    background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный черный фон */
+    
+    /* 4. Центрирование содержимого */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Отступы для мобильных */
+    box-sizing: border-box;
+}
+
+.modal-content-wrapper {
+    position: relative;
+    background-color: var(--white-bg);
+    padding: 25px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-hover);
+    
+    /* 5. ГЛАВНОЕ: Ограничение размера (НЕ на весь экран) */
+    max-width: 80vw;  /* Макс. ширина 80% от ширины экрана */
+    max-height: 85vh; /* Макс. высота 85% от высоты экрана */
+
+    /* 6. Анимация появления (используем вашу) */
+    animation: fadeIn 0.4s ease-out;
+    
+    /* 7. Позволяем контейнеру сжиматься и расти */
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-image {
+    width: 100%;
+    height: auto;
+    /* Изображение будет занимать доступное место, но не более чем... */
+    max-height: 75vh; /* Оставляем место для заголовка и отступов */
+    object-fit: contain; /* Сохраняем пропорции, "вписывая" картинку */
+    border-radius: var(--border-radius-md);
+}
+
+#modal-caption {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-top: 15px;
+    margin-bottom: 0;
+}
+
+.modal-close-btn {
+    /* 8. Кнопка "свернуть" (крестик) */
+    position: absolute;
+    top: -10px;  /* Немного выносим за пределы белого фона */
+    right: -10px;
+    
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.5rem; /* Размер крестика */
+    font-weight: bold;
+    line-height: 1.1;
+    
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    cursor: pointer;
+    border: 2px solid var(--white-bg); /* "Вырезаем" из фона */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 1001; /* Поверх картинки */
+}
+
+.modal-close-btn:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.1); /* "Приподнимаем" кнопку */
+}
+
+
+/* =======================================
+   9. СТИЛИ ССЫЛОК ГАЛЕРЕИ НА ГЛАВНОЙ (НОВОЕ)
+   ======================================= */
+.gallery-link-wrapper {
+    /* Делает ссылку невидимой, но активной */
+    text-decoration: none;
+    color: inherit;
+    display: block; /* Важно, чтобы ссылка занимала всю площадь карточки */
+}
+
+/* Перенаправляем эффекты наведения на обертку ссылки */
+.gallery-link-wrapper:hover .gallery-item {
+    box-shadow: var(--shadow-hover);
+}
+
+.gallery-link-wrapper:hover .gallery-item img {
+    transform: scale(1.05);
 }

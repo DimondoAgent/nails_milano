@@ -15,9 +15,7 @@
     <div class="gallery-grid">
         {% for work in latest_works %}
         <div class="gallery-item">
-            <a href="{{ url_for('gallery') }}">
-                <img src="{{ url_for('static', filename='images/' + work.image_filename) }}" alt="{{ work.title }}">
-            </a>
+            <img src="{{ url_for('static', filename='images/' + work.image_filename) }}" alt="{{ work.title }}">
         </div>
         {% else %}
         <p>Will be more soon</p>
