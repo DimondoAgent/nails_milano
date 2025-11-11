@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Main Page | GLAM NAILS MILANO{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>The perfect manicure with me</h1>
+        <p>Quality, sterility and beauty in each detail</p>
+        <a href="{{ url_for('booking') }}" class="btn-cta-large">Make a prenotation now</a>
+    </div>
+</section>
+
+<section class="latest-works container">
+    <h2>My previous work</h2>
+    <div class="gallery-grid">
+        {% for work in latest_works %}
+        <div class="gallery-item">
+            <a href="{{ url_for('gallery') }}">
+                <img src="{{ url_for('static', filename='images/' + work.image_filename) }}" alt="{{ work.title }}">
+            </a>
+        </div>
+        {% else %}
+        <p>Will be more soon</p>
+        {% endfor %}
+    </div>
+    {#<div style="text-align: center; margin-top: 1rem;">
+        <a href="{{ url_for('gallery') }}" class="btn-secondary">Full gallery</a>
+    </div>#}
+</section>
+
+{% endblock %}

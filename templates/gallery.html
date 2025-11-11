@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Gallery | GLAM NAILS MILANO{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Works: </h1>
+    <div class="gallery-grid full-gallery">
+        {% for work in works %}
+        <div class="gallery-item">
+            <img src="{{ url_for('static', filename='images/' + work.image_filename) }}" alt="{{ work.title }}">
+            <p>{{ work.title }}</p>
+        </div>
+        {% else %}
+        <p>No works yet. It'll be added soon!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

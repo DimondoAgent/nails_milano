@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+<div class="container admin-panel">
+    <h1>Админ-панель</h1>
+    <p>Добро пожаловать, {{ current_user.username }}! <a href="{{ url_for('logout') }}" class="btn-delete">(Выйти)</a></p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="admin-sections">
+        <section class="admin-section">
+            <h2>Добавить услугу</h2>
+            <form method="POST" action="{{ url_for('admin') }}" class="admin-form">
+                {{ service_form.hidden_tag() }} <div class="form-group">
+                    {{ service_form.name.label }}
+                    {{ service_form.name(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ service_form.price.label }}
+                    {{ service_form.price(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ service_form.description.label }}
+                    {{ service_form.description(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ service_form.submit_service(class="btn-cta") }}
+                </div>
+            </form>
+            
+            <hr class="admin-divider">
+
+            <h3>Текущие услуги:</h3>
+            <ul class="admin-list">
+                {% for s in services %}
+                <li>
+                    <span>{{ s.name }} ({{ s.price }} ₽)<br><small>{{ s.description }}</small></span>
+                    <form method="POST" action="{{ url_for('delete_service', service_id=s.id) }}" style="margin: 0;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Точно удалить услугу {{ s.name }}?')">Удалить</button>
+                    </form>
+                </li>
+                {% else %}
+                <li>Услуг пока нет.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="admin-section">
+            <h2>Загрузить фото в галерею</h2>
+            <form method="POST" action="{{ url_for('admin') }}" enctype="multipart/form-data" class="admin-form">
+                {{ gallery_form.hidden_tag() }}
+                <div class="form-group">
+                    {{ gallery_form.title.label }} 
+                    {{ gallery_form.title(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ gallery_form.image.label }} 
+                    {{ gallery_form.image(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ gallery_form.submit_gallery(class="btn-cta") }}
+                </div>
+            </form>
+
+            <hr class="admin-divider">
+
+            <h3>Загруженные работы:</h3>
+            <ul class="admin-list">
+                {% for w in works %}
+                <li>
+                    <span><img src="{{ url_for('static', filename='images/' + w.image_filename) }}" class="admin-thumb" alt=""> {{ w.title }}</span>
+                    <form method="POST" action="{{ url_for('delete_work', work_id=w.id) }}" style="margin: 0;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Точно удалить работу {{ w.title }}?')">Удалить</button>
+                    </form>
+                </li>
+                {% else %}
+                <li>Фотографий пока нет.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        </section> <section class="admin-section">
+            <h2>Предстоящие записи</h2>
+            <ul class="admin-list appointments-list">
+                {% for appt in appointments %}
+                <li>
+                    <span>
+                        <strong>{{ appt.start_datetime.strftime('%d.%m.%Y %H:%M') }}</strong><br>
+                        Клиент: {{ appt.client_name }} ({{ appt.client_phone }})<br>
+                        Услуга: {{ appt.service.name }}
+                    </span>
+                    <form method="POST" action="{{ url_for('delete_appointment', appointment_id=appt.id) }}" style="margin: 0;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Отменить запись клиента {{ appt.client_name }}?')">Отменить</button>
+                    </form>
+                </li>
+                {% else %}
+                <li>Предстоящих записей нет.</li>
+                {% endfor %}
+            </ul>
+        </section>
+        </div> </div>
+
+    </div>
+</div>
+{% endblock %}

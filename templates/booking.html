@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% block title %}Online prenotation | GLAM NAILS MILANO{% endblock %}
+
+{% block content %}
+<div class="container booking-page">
+    <h1>Онлайн-запись</h1>
+    <div class="booking-container">
+        
+        <div class="calendar-container">
+            <h2>Выберите дату:</h2>
+            <div class="simple-calendar">
+                <div class="calendar-header">
+                    <button id="prev-month">&lt;</button>
+                    <h3 id="month-year"></h3>
+                    <button id="next-month">&gt;</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>
+                    </thead>
+                    <tbody id="calendar-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="slots-container">
+            <h2>Доступное время на <span id="selected-date">...</span>:</h2>
+            
+            <div id="time-slots">Выберите дату в календаре.</div>
+            
+            <div id="booking-form-container" style="display: none;">
+                <h3>Заполните данные:</h3>
+                <form id="booking-form">
+                    <input type="hidden" id="selected-datetime" name="datetime">
+                    <div class="form-group">
+                        <label for="client-name">Ваше имя:</label>
+                        <input type="text" id="client-name" name="name" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-phone">Телефон:</label>
+                        <input type="tel" id="client-phone" name="phone" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="service-select">Услуга:</label>
+                        <select id="service-select" name="service_id" required class="form-control">
+                            <option value="" disabled selected>-- Выберите услугу --</option>
+                            {% for service in services %}
+                                <option value="{{ service.id }}">
+                                    {{ service.name }} ({{ service.price }} ₽)
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-cta">Записаться</button>
+                </form>
+                <div id="booking-message"></div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Получаем все нужные элементы ОДИН РАЗ ---
+    const calendarBody = document.getElementById('calendar-body');
+    const monthYearDisplay = document.getElementById('month-year');
+    
+    // *** ВАЖНОЕ ИСПРАВЛЕНИЕ ***
+    // У нас ID 'selected-date', а не 'selected-date-display'
+    const selectedDateDisplay = document.getElementById('selected-date'); 
+    
+    const timeSlotsDiv = document.getElementById('time-slots');
+    const bookingFormContainer = document.getElementById('booking-form-container');
+    const bookingMessageDiv = document.getElementById('booking-message');
+    const bookingForm = document.getElementById('booking-form');
+    const selectedDateTimeField = document.getElementById('selected-datetime');
+    const clientNameField = document.getElementById('client-name');
+    const clientPhoneField = document.getElementById('client-phone');
+    const serviceSelectField = document.getElementById('service-select');
+
+    let currentDate = new Date();
+    let selectedTd = null; // Хранит выбранную ячейку дня
+
+    // --- Логика Календаря ---
+    function renderCalendar(year, month) {
+        calendarBody.innerHTML = ''; // Очистить старый календарь
+        monthYearDisplay.textContent = `${['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][month]} ${year}`;
+        
+        const firstDayOfMonth = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        let startingDay = firstDayOfMonth.getDay(); 
+        if (startingDay === 0) startingDay = 6; else startingDay--; 
+
+        const today = new Date();
+        today.setHours(0,0,0,0); 
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) { 
+            const row = document.createElement('tr');
+            for (let j = 0; j < 7; j++) {
+                const cell = document.createElement('td');
+                if (i === 0 && j < startingDay) {
+                    cell.classList.add('disabled');
+                } else if (date > daysInMonth) {
+                    cell.classList.add('disabled');
+                } else {
+                    cell.textContent = date;
+                    const cellDate = new Date(year, month, date);
+                    cellDate.setHours(0,0,0,0);
+
+                    if (cellDate < today) {
+                        cell.classList.add('disabled');
+                    } else {
+                        cell.classList.add('available');
+                        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                        cell.dataset.date = dateString; 
+                        
+                        cell.onclick = (event) => {
+                             if (selectedTd) selectedTd.classList.remove('selected');
+                             selectedTd = event.target;
+                             selectedTd.classList.add('selected');
+                             loadSlots(dateString);
+                        };
+                        
+                        if (cellDate.getTime() === today.getTime()) {
+                             cell.classList.add('today');
+                        }
+                    }
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+            calendarBody.appendChild(row);
+            if (date > daysInMonth) break; 
+        }
+    }
+
+    document.getElementById('prev-month').onclick = () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    };
+    document.getElementById('next-month').onclick = () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    };
+
+    // --- Логика Слотов ---
+    function loadSlots(dateString) {
+        selectedDateDisplay.textContent = dateString; // Обновляем заголовок
+        timeSlotsDiv.innerHTML = '<div class="spinner"></div> Загрузка...'; 
+        bookingFormContainer.style.display = 'none'; 
+        bookingMessageDiv.textContent = '';
+        
+        fetch(`/api/get_slots?date=${dateString}`)
+            .then(response => response.json())
+            .then(data => {
+                timeSlotsDiv.innerHTML = ''; 
+                if (data.slots && data.slots.length > 0) {
+                    data.slots.forEach(slot => {
+                        const button = document.createElement('button');
+                        button.textContent = slot;
+                        button.classList.add('slot-button');
+                        button.onclick = (event) => showBookingForm(dateString, slot, event); 
+                        timeSlotsDiv.appendChild(button);
+                    });
+                } else if (data.error) {
+                     timeSlotsDiv.innerHTML = `<p class="error-message">Ошибка: ${data.error}</p>`;
+                } else {
+                    timeSlotsDiv.innerHTML = '<p>На эту дату нет свободных слотов.</p>';
+                }
+            })
+            .catch(error => {
+                timeSlotsDiv.innerHTML = '<p class="error-message">Не удалось загрузить слоты. Попробуйте позже.</p>';
+                console.error('Error fetching slots:', error);
+            });
+    }
+
+    // --- Логика Формы ---
+    function showBookingForm(dateString, timeString, event) {
+        selectedDateTimeField.value = `${dateString} ${timeString}`; 
+        bookingFormContainer.style.display = 'block';
+        bookingMessageDiv.textContent = ''; 
+        
+        // Выделяем нажатый слот
+        document.querySelectorAll('.slot-button.selected').forEach(btn => btn.classList.remove('selected'));
+        if (event) { // Добавлена проверка, что event существует
+            event.target.classList.add('selected');
+        }
+    }
+
+    bookingForm.addEventListener('submit', function(event) {
+        event.preventDefault(); 
+        
+        bookingMessageDiv.textContent = 'Обработка...';
+        bookingMessageDiv.className = 'info-message'; 
+
+        const formData = {
+            name: clientNameField.value,
+            phone: clientPhoneField.value,
+            datetime: selectedDateTimeField.value,
+            service_id: serviceSelectField.value
+        };
+
+        if (!formData.service_id) {
+             bookingMessageDiv.textContent = 'Пожалуйста, выберите услугу.';
+             bookingMessageDiv.className = 'error-message';
+             return;
+        }
+
+        fetch('/api/book_slot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data }))) 
+        .then(({ status, body }) => {
+            if (status === 200 && body.success) {
+                bookingMessageDiv.textContent = body.message;
+                bookingMessageDiv.className = 'success-message';
+                bookingFormContainer.style.display = 'none'; 
+                // Обновляем слоты, чтобы показать, что этот занят
+                loadSlots(formData.datetime.split(' ')[0]); 
+            } else {
+                bookingMessageDiv.textContent = `Ошибка: ${body.message || 'Не удалось записаться.'}`;
+                bookingMessageDiv.className = 'error-message';
+            }
+        })
+        .catch(error => {
+             bookingMessageDiv.textContent = 'Ошибка сети. Попробуйте позже.';
+             bookingMessageDiv.className = 'error-message';
+             console.error('Error booking slot:', error);
+        });
+    });
+
+    // --- Инициализация ---
+    renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+
+</script>
+{% endblock %}
