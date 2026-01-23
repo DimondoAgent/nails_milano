@@ -1,114 +1,103 @@
 {% extends "base.html" %}
-{% block title %}Админ-панель{% endblock %}
 
 {% block content %}
-<div class="container admin-panel">
-    <h1>Админ-панель</h1>
-    <p>Добро пожаловать, {{ current_user.username }}! <a href="{{ url_for('logout') }}" class="btn-delete">(Выйти)</a></p>
-    
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Панель Управления</h1>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Выйти</a>
+    </div>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-container">
-            {% for category, message in messages %}
-                <div class="flash-message {{ category }}">{{ message }}</div>
-            {% endfor %}
-            </div>
-        {% endif %}
+      {% if messages %}
+        <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
     {% endwith %}
 
-    <div class="admin-sections">
-        <section class="admin-section">
-            <h2>Добавить услугу</h2>
-            <form method="POST" action="{{ url_for('admin') }}" class="admin-form">
-                {{ service_form.hidden_tag() }} <div class="form-group">
-                    {{ service_form.name.label }}
-                    {{ service_form.name(class="form-control") }}
-                </div>
-                <div class="form-group">
-                    {{ service_form.price.label }}
-                    {{ service_form.price(class="form-control") }}
-                </div>
-                <div class="form-group">
-                    {{ service_form.description.label }}
-                    {{ service_form.description(class="form-control") }}
-                </div>
-                <div class="form-group">
-                    {{ service_form.submit_service(class="btn-cta") }}
-                </div>
-            </form>
-            
-            <hr class="admin-divider">
-
-            <h3>Текущие услуги:</h3>
-            <ul class="admin-list">
-                {% for s in services %}
-                <li>
-                    <span>{{ s.name }} ({{ s.price }} ₽)<br><small>{{ s.description }}</small></span>
-                    <form method="POST" action="{{ url_for('delete_service', service_id=s.id) }}" style="margin: 0;">
-                        <button type="submit" class="btn-delete" onclick="return confirm('Точно удалить услугу {{ s.name }}?')">Удалить</button>
-                    </form>
-                </li>
-                {% else %}
-                <li>Услуг пока нет.</li>
-                {% endfor %}
-            </ul>
-        </section>
-
-        <section class="admin-section">
-            <h2>Загрузить фото в галерею</h2>
-            <form method="POST" action="{{ url_for('admin') }}" enctype="multipart/form-data" class="admin-form">
+    <div class="admin-grid">
+        <div class="admin-card add-product-card">
+            <h2>Добавить новый лот</h2>
+            <form method="POST" enctype="multipart/form-data" class="admin-form">
                 {{ gallery_form.hidden_tag() }}
+                
                 <div class="form-group">
-                    {{ gallery_form.title.label }} 
-                    {{ gallery_form.title(class="form-control") }}
+                    <label>Бренд</label>
+                    {{ gallery_form.brand(class="form-input") }}
                 </div>
+
                 <div class="form-group">
-                    {{ gallery_form.image.label }} 
-                    {{ gallery_form.image(class="form-control") }}
+                    <label>Название модели</label>
+                    {{ gallery_form.title(class="form-input") }}
                 </div>
-                <div class="form-group">
-                    {{ gallery_form.submit_gallery(class="btn-cta") }}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Цена</label>
+                        {{ gallery_form.price(class="form-input") }}
+                    </div>
+                    <div class="form-group">
+                        <label>Размер</label>
+                        {{ gallery_form.size(class="form-input") }}
+                    </div>
                 </div>
+
+                <div class="form-group file-upload">
+                    <label class="file-label">
+                        {{ gallery_form.image(class="file-input") }}
+                        <span class="file-custom">Выберите фото...</span>
+                    </label>
+                </div>
+
+                {{ gallery_form.submit_gallery(class="btn-submit") }}
             </form>
+        </div>
 
-            <hr class="admin-divider">
-
-            <h3>Загруженные работы:</h3>
-            <ul class="admin-list">
-                {% for w in works %}
-                <li>
-                    <span><img src="{{ url_for('static', filename='images/' + w.image_filename) }}" class="admin-thumb" alt=""> {{ w.title }}</span>
-                    <form method="POST" action="{{ url_for('delete_work', work_id=w.id) }}" style="margin: 0;">
-                        <button type="submit" class="btn-delete" onclick="return confirm('Точно удалить работу {{ w.title }}?')">Удалить</button>
-                    </form>
-                </li>
-                {% else %}
-                <li>Фотографий пока нет.</li>
-                {% endfor %}
-            </ul>
-        </section>
-
-        </section> <section class="admin-section">
-            <h2>Предстоящие записи</h2>
-            <ul class="admin-list appointments-list">
-                {% for appt in appointments %}
-                <li>
-                    <span>
-                        <strong>{{ appt.start_datetime.strftime('%d.%m.%Y %H:%M') }}</strong><br>
-                        Клиент: {{ appt.client_name }} ({{ appt.client_phone }})<br>
-                        Услуга: {{ appt.service.name }}
-                    </span>
-                    <form method="POST" action="{{ url_for('delete_appointment', appointment_id=appt.id) }}" style="margin: 0;">
-                        <button type="submit" class="btn-delete" onclick="return confirm('Отменить запись клиента {{ appt.client_name }}?')">Отменить</button>
-                    </form>
-                </li>
-                {% else %}
-                <li>Предстоящих записей нет.</li>
-                {% endfor %}
-            </ul>
-        </section>
-        </div> </div>
-
+        <div class="admin-card product-list-card">
+            <h2>Текущие товары ({{ works|length }})</h2>
+            <div class="product-table-wrapper">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Фото</th>
+                            <th>Информация</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in works %}
+                        <tr class="{% if item.is_sold_out %}row-sold{% endif %}">
+                            <td>
+                                <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" class="admin-thumb">
+                            </td>
+                            <td>
+                                <strong>{{ item.brand }}</strong><br>
+                                {{ item.title }}<br>
+                                <span class="meta-text">{{ item.price }} | {{ item.size }}</span>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('toggle_status', work_id=item.id) }}" method="POST">
+                                    {% if item.is_sold_out %}
+                                        <button type="submit" class="status-btn sold">SOLD OUT</button>
+                                    {% else %}
+                                        <button type="submit" class="status-btn active">В ПРОДАЖЕ</button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('delete_work', work_id=item.id) }}" method="POST" onsubmit="return confirm('Удалить этот товар?');">
+                                    <button type="submit" class="btn-delete">×</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

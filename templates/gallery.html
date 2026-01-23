@@ -1,18 +1,53 @@
 {% extends "base.html" %}
-{% block title %}Gallery | GLAM NAILS MILANO{% endblock %}
+{% block title %}Collections | MÆLE SOURCE{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Works: </h1>
-    <div class="gallery-grid full-gallery">
-        {% for work in works %}
-        <div class="gallery-item">
-            <img src="{{ url_for('static', filename='images/' + work.image_filename) }}" alt="{{ work.title }}">
-            <p>{{ work.title }}</p>
+<section class="collections-page">
+    <div class="side-glow left"></div>
+    <div class="side-glow right"></div>
+
+    <div class="container">
+        <div class="collections-header" data-aos="fade-up">
+            <h1 class="display-title">Archive <span class="italic-accent">Collections</span></h1>
+            <p class="subtitle">Ранее выкупленные и доставленные изделия</p>
         </div>
-        {% else %}
-        <p>No works yet. It'll be added soon!</p>
-        {% endfor %}
+
+        <div class="products-grid">
+            
+            {% for item in works %}
+            <div class="product-card {% if loop.index == 1 %}tall{% elif loop.index == 4 %}wide{% endif %}" 
+                 data-aos="fade-up" 
+                 data-aos-delay="{{ loop.index0 * 100 }}">
+                
+                <div class="product-image">
+                    <img src="{{ url_for('static', filename='images/' + item.image_filename) }}" alt="{{ item.title }}">
+                    {% if item.is_sold_out %}
+                        <div class="product-badge">Sold Out</div>
+                    {% endif %}
+                </div>
+
+                <div class="product-info">
+                    <span class="brand">{{ item.brand|upper }}</span>
+                    <h3 class="name">{{ item.title }}</h3>
+                    <p class="price">
+                        {% if item.is_sold_out %}
+                            Collected by Client
+                        {% else %}
+                            {{ item.price if item.price else 'Price on request' }}
+                        {% endif %}
+                    </p>
+                    {% if item.size %}
+                        <p class="size" style="font-size: 0.8rem; color: #888;">Size: {{ item.size }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>Архив коллекций пуст.</p>
+            </div>
+            {% endfor %}
+
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

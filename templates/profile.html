@@ -1,59 +1,90 @@
 {% extends "base.html" %}
-{% block title %}About me | GLAM NAILS MILANO{% endblock %}
+{% block title %}About Me | MÆLE SOURCE{% endblock %}
 
 {% block content %}
-    <body>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-        <link rel="stylesheet" href="style.css">
-        <title>MARGARITA</title>
-        <div class="profile-card">
-            
-            <div class="profile-main-layout">
-                
-                <div class="profile-photo-col">
-                    <img src="static/images/photo_2025-10-22_11-28-39.jpg" alt="Фото мастера" class="profile-avatar">
+
+<section class="profile-page">
+
+    <div class="bg-gradient-glow left"></div>
+    <div class="bg-gradient-glow right"></div>
+    
+    <div class="container">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        
+        <div class="profile-intro grid-layout" data-aos="fade-up">
+            <div class="text-block">
+                <h2 class="section-label">01 / ABOUT ME</h2>
+                <h1 class="display-title">Hello, I'm Elmira — <br><span class="italic-accent">your personal buyer</span></h1>
+                <p class="description">
+                   I'm Europe-based personal buyer sourcing authentic luxury and curated middle to middle-up fashion directly from Italy. With over a year of experience, I work with trusted boutiques, online stores, and outlets.
+                </p>
+                <span class="separator">✦</span>
+                <p class="description">
+                    Welcome to MÆLE SOURCE — your direct access to Europe’s best shopping.
+                </p>
+
+            </div>
+            <div class="image-block">
+                <div class="main-portrait">
+                    <img src="{{ url_for('static', filename='images/ilm.png') }}" alt="Anna Profile">
                 </div>
-                
-                <div class="profile-details-col">
-                    
-                    <header class="profile-header-details">
-                        <h1>MARGARITA</h1>
-                        <p class="profile-title">ТOP SLAVIC SPECIALIST YOU'VE EVER DREAMED ABOUT</p>
-                    </header>
-                    
-                    <section class="profile-section">
-                        <h2><i class="fas fa-user"></i> My small description :)</h2>
-                        <p>The most gentile beauty master</p>
-                    </section>
-                    
-                    <section class="profile-section">
-                        <h2><i class="fas fa-trophy"></i> Achievements</h2>
-                        <ul class="achievements-list">
-                            <li><i class="fas fa-star"></i><span>Победитель конкурса "Golden Nail 2024"...</span></li>
-                            <li><i class="fas fa-certificate"></i><span>Сертифицированный мастер по аппаратному...</span></li>
-                            <li><i class="fas fa-book-open"></i><span>Прошла 10+ курсов повышения...</span></li>
-                            <li><i class="fas fa-users"></i><span>Более 1500 довольных клиентов...</span></li>
-                        </ul>
-                    </section>
-                    
-                    <section class="profile-section">
-                        <h2><i class="fas fa-heart"></i> Why you should choose me</h2>
-                        <div class="why-choose-me">
-                            <div class="reason">
-                                <h3><i class="fas fa-shield-virus"></i> Sterility 100%</h3>
-                                <p>Full work-devices sterilization...</p>
-                            </div>
-                            <div class="reason">
-                                <h3><i class="fas fa-gem"></i> Materils quality</h3>
-                                <p>Work only with hippoallergic materials...</p>
-                            </div>
-                            <div class="reason">
-                                <h3><i class="fas fa-comments"></i> Compfortable atosphere</h3>
-                                <p>Cozy place for your hands <class="fas fa-heart">...</p>
-                            </div>
-                        </div>
-                    </section>
-                    
-                </div> </div> </div> </body>
-    </html>
+                <div class="detail-crop" data-aos="zoom-in" data-aos-delay="200">
+                     <p>PARIS, FRANCE</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="marquee-wrapper">
+            <div class="marquee-track scroll-left" style="animation-duration: 60s;">
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+            </div>
+        </div>
+
+        <div class="why-me-section grid-layout" data-aos="fade-up">
+            <div class="text-block">
+                <h2 class="section-label">02 / WHY ME?</h2>
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <span class="benefit-num">/01</span>
+                        <p>Effortless. </p>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-num">/02</span>
+                        <p>Authentic.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-num">/03</span>
+                        <p> Without borders</p>
+                    </div>
+                </div>
+            </div>
+            <div class="portfolio-preview">
+                <div class="mini-gallery">
+                    <div class="gallery-col-big">
+                        <img src="{{ url_for('static', filename='images/herm.jpg') }}" alt="Work 1">
+                    </div>
+                    <div class="gallery-col-small">
+                        <img src="{{ url_for('static', filename='images/cart.jpg') }}" alt="Work 2">
+                        <img src="{{ url_for('static', filename='images/par.jpg') }}" alt="Work 3">
+                    </div>
+                </div>
+                <div class="action-btn-wrapper">
+                    <a href="https://t.me/elmirasulova" class="btn-outlined-large" target="_blank" rel="noopener noreferrer">@elmirasulova</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
 {% endblock %}

@@ -1,13 +1,105 @@
-{% extends "base.html" %} {% block content %} <div class="container">
-        <h1>Наши Услуги</h1>
-        <div class="price-list">
-            {% for service in services %}
-            <div class="service-item">
-                <h3>{{ service.name }}</h3>
-                <p>{{ service.description }}</p>
-                <span class="price">{{ service.price }} ₽</span>
-            </div>
-            {% endfor %}
+{% extends "base.html" %}
+{% block title %}Designers | MÆLE SOURCE{% endblock %}
+
+{% block content %}
+<section class="designers-page">
+    
+    <div class="container" style="text-align: center; margin-bottom: 60px;">
+        <h1 class="page-title" data-aos="fade-down">Our Partners</h1>
+        <p class="page-subtitle" data-aos="fade-up">Exclusive access to the world's finest fashion houses</p>
+    </div>
+
+    <div class="marquee-wrapper">
+        <div class="marquee-track scroll-left" style="animation-duration: 60s;">
+            <a href="https://www.balenciaga.com" target="_blank" class="brand-item">Balenciaga</a><span class="separator">✦</span>
+            <a href="https://www.chanel.com" target="_blank" class="brand-item">Chanel</a><span class="separator">✦</span>
+            <a href="https://www.dior.com" target="_blank" class="brand-item">Dior</a><span class="separator">✦</span>
+            <a href="https://www.gucci.com" target="_blank" class="brand-item">Gucci</a><span class="separator">✦</span>
+            <a href="https://www.prada.com" target="_blank" class="brand-item">Prada</a><span class="separator">✦</span>
+            <a href="https://www.miumiu.com" target="_blank" class="brand-item">Miu Miu</a><span class="separator">✦</span>
+            <a href="https://www.hermes.com" target="_blank" class="brand-item">Hermès</a><span class="separator">✦</span>
+            <a href="https://www.alexandermcqueen.com" target="_blank" class="brand-item">Alexander McQueen</a><span class="separator">✦</span>
+            <a href="https://www.rickowens.eu" target="_blank" class="brand-item">Rick Owens</a><span class="separator">✦</span>
+            <a href="https://www.maisonmargiela.com" target="_blank" class="brand-item">Maison Margiela</a><span class="separator">✦</span>
+            <a href="https://www.ysl.com" target="_blank" class="brand-item">Saint Laurent</a><span class="separator">✦</span>
+
+            <a href="https://www.balenciaga.com" target="_blank" class="brand-item">Balenciaga</a><span class="separator">✦</span>
+            <a href="https://www.alexandermcqueen.com" target="_blank" class="brand-item">Alexander McQueen</a><span class="separator">✦</span>
+            <a href="https://www.rickowens.eu" target="_blank" class="brand-item">Rick Owens</a><span class="separator">✦</span>
+            <a href="https://www.maisonmargiela.com" target="_blank" class="brand-item">Maison Margiela</a><span class="separator">✦</span>
+            <a href="https://www.ysl.com" target="_blank" class="brand-item">Saint Laurent</a><span class="separator">✦</span>
+
+            <a href="https://www.balenciaga.com" target="_blank" class="brand-item">Balenciaga</a><span class="separator">✦</span>
+            <a href="https://www.alexandermcqueen.com" target="_blank" class="brand-item">Alexander McQueen</a><span class="separator">✦</span>
+            <a href="https://www.rickowens.eu" target="_blank" class="brand-item">Rick Owens</a><span class="separator">✦</span>
+            <a href="https://www.maisonmargiela.com" target="_blank" class="brand-item">Maison Margiela</a><span class="separator">✦</span>
+            <a href="https://www.ysl.com" target="_blank" class="brand-item">Saint Laurent</a><span class="separator">✦</span>
+
+            <a href="https://www.balenciaga.com" target="_blank" class="brand-item">Balenciaga</a><span class="separator">✦</span>
+            <a href="https://www.alexandermcqueen.com" target="_blank" class="brand-item">Alexander McQueen</a><span class="separator">✦</span>
+            <a href="https://www.rickowens.eu" target="_blank" class="brand-item">Rick Owens</a><span class="separator">✦</span>
+            <a href="https://www.maisonmargiela.com" target="_blank" class="brand-item">Maison Margiela</a><span class="separator">✦</span>
+            <a href="https://www.ysl.com" target="_blank" class="brand-item">Saint Laurent</a><span class="separator">✦</span>
         </div>
     </div>
+
+    <div class="marquee-wrapper">
+        <div class="marquee-track scroll-right hollow-text" style="animation-duration: 70s;">
+            <a href="https://www.versace.com" target="_blank" class="brand-item">Versace</a><span class="separator">●</span>
+            <a href="https://www.tomford.com" target="_blank" class="brand-item">Tom Ford</a><span class="separator">●</span>
+            <a href="https://www.jacquemus.com" target="_blank" class="brand-item">Jacquemus</a><span class="separator">●</span>
+            <a href="https://www.bottegaveneta.com" target="_blank" class="brand-item">Bottega Veneta</a><span class="separator">●</span>
+            <a href="https://www.prada.com" target="_blank" class="brand-item">Prada</a><span class="separator">●</span>
+
+            <a href="https://www.versace.com" target="_blank" class="brand-item">Versace</a><span class="separator">●</span>
+            <a href="https://www.tomford.com" target="_blank" class="brand-item">Tom Ford</a><span class="separator">●</span>
+            <a href="https://www.jacquemus.com" target="_blank" class="brand-item">Jacquemus</a><span class="separator">●</span>
+            <a href="https://www.bottegaveneta.com" target="_blank" class="brand-item">Bottega Veneta</a><span class="separator">●</span>
+            <a href="https://www.prada.com" target="_blank" class="brand-item">Prada</a><span class="separator">●</span>
+
+            <a href="https://www.versace.com" target="_blank" class="brand-item">Versace</a><span class="separator">●</span>
+            <a href="https://www.tomford.com" target="_blank" class="brand-item">Tom Ford</a><span class="separator">●</span>
+            <a href="https://www.jacquemus.com" target="_blank" class="brand-item">Jacquemus</a><span class="separator">●</span>
+            <a href="https://www.bottegaveneta.com" target="_blank" class="brand-item">Bottega Veneta</a><span class="separator">●</span>
+            <a href="https://www.prada.com" target="_blank" class="brand-item">Prada</a><span class="separator">●</span>
+
+            <a href="https://www.versace.com" target="_blank" class="brand-item">Versace</a><span class="separator">●</span>
+            <a href="https://www.tomford.com" target="_blank" class="brand-item">Tom Ford</a><span class="separator">●</span>
+            <a href="https://www.jacquemus.com" target="_blank" class="brand-item">Jacquemus</a><span class="separator">●</span>
+            <a href="https://www.bottegaveneta.com" target="_blank" class="brand-item">Bottega Veneta</a><span class="separator">●</span>
+            <a href="https://www.prada.com" target="_blank" class="brand-item">Prada</a><span class="separator">●</span>
+        </div>
+    </div>
+
+    <div class="marquee-wrapper">
+        <div class="marquee-track scroll-left" style="animation-duration: 60s;">
+            <a href="https://www.givenchy.com" target="_blank" class="brand-item accent-color">Givenchy</a><span class="separator">✦</span>
+            <a href="https://www.valentino.com" target="_blank" class="brand-item accent-color">Valentino</a><span class="separator">✦</span>
+            <a href="https://www.loewe.com" target="_blank" class="brand-item accent-color">Loewe</a><span class="separator">✦</span>
+            <a href="https://www.fendi.com" target="_blank" class="brand-item accent-color">Fendi</a><span class="separator">✦</span>
+            <a href="https://www.off---white.com" target="_blank" class="brand-item accent-color">Off-White</a><span class="separator">✦</span>
+
+            <a href="https://www.givenchy.com" target="_blank" class="brand-item accent-color">Givenchy</a><span class="separator">✦</span>
+            <a href="https://www.valentino.com" target="_blank" class="brand-item accent-color">Valentino</a><span class="separator">✦</span>
+            <a href="https://www.loewe.com" target="_blank" class="brand-item accent-color">Loewe</a><span class="separator">✦</span>
+            <a href="https://www.fendi.com" target="_blank" class="brand-item accent-color">Fendi</a><span class="separator">✦</span>
+            <a href="https://www.off---white.com" target="_blank" class="brand-item accent-color">Off-White</a><span class="separator">✦</span>
+
+            <a href="https://www.givenchy.com" target="_blank" class="brand-item accent-color">Givenchy</a><span class="separator">✦</span>
+            <a href="https://www.valentino.com" target="_blank" class="brand-item accent-color">Valentino</a><span class="separator">✦</span>
+            <a href="https://www.loewe.com" target="_blank" class="brand-item accent-color">Loewe</a><span class="separator">✦</span>
+            <a href="https://www.fendi.com" target="_blank" class="brand-item accent-color">Fendi</a><span class="separator">✦</span>
+            <a href="https://www.off---white.com" target="_blank" class="brand-item accent-color">Off-White</a><span class="separator">✦</span>
+
+            <a href="https://www.givenchy.com" target="_blank" class="brand-item accent-color">Givenchy</a><span class="separator">✦</span>
+            <a href="https://www.valentino.com" target="_blank" class="brand-item accent-color">Valentino</a><span class="separator">✦</span>
+            <a href="https://www.loewe.com" target="_blank" class="brand-item accent-color">Loewe</a><span class="separator">✦</span>
+            <a href="https://www.fendi.com" target="_blank" class="brand-item accent-color">Fendi</a><span class="separator">✦</span>
+            <a href="https://www.off---white.com" target="_blank" class="brand-item accent-color">Off-White</a><span class="separator">✦</span>
+        </div>
+    </div>
+</div>
+
+
+</section>
 {% endblock %}

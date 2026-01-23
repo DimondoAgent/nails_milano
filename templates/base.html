@@ -3,53 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}GLAM NAILS MILANO{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="style.css">
-
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>{% block title %}MÆLE SOURCE{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     {% block head %}{% endblock %}
-
 </head>
 <body>
+
     <header class="header">
         <nav class="navbar container">
-            <a href="{{ url_for('index') }}" class="nav-logo">GLAM NAILS MILANO</a>
-            <ul class="nav-menu">
-                <li><a href="{{ url_for('profile') }}">About me</a></li>
-                <li><a href="{{ url_for('services') }}">Services</a></li>
-                <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
-                <li><a href="{{ url_for('booking') }}" class="btn-cta">Prenotation</a></li>
-            </ul>
+            <div class="nav-left">
+                <a href="{{ url_for('gallery') }}">Collections</a>
+                <a href="{{ url_for('services') }}">Designers</a>
+            </div>
+
+            <a href="{{ url_for('index') }}" class="nav-logo">MÆLE SOURCE</a>
+
+            <div class="nav-right">
+                <a href="{{ url_for('profile') }}">About</a>
+                <a href="{{ url_for('booking') }}">Reviews</a>
+            </div>
         </nav>
     </header>
 
     <main class="page-content">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            <div class="container flash-container">
-                {% for category, message in messages %}
-                <div class="flash-message {{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
+                <div class="flash-wrapper">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
     </main>
-    
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
     <script>
         AOS.init({
-            duration: 800, // Длительность анимации
-            once: true,    // Анимация проигрывается один раз
-            offset: 50     // Отступ от низа экрана
+            duration: 1200,
+            once: true,
+            offset: 50
         });
     </script>
-
     {% block scripts %}{% endblock %}
-
 </body>
 </html>

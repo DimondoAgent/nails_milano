@@ -1,29 +1,87 @@
 {% extends "base.html" %}
-{% block title %}Main Page | GLAM NAILS MILANO{% endblock %}
+{% block title %}Design & Freedom | MÆLE SOURCE{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="container">
-        <h1>The perfect manicure with me</h1>
-        <p>Quality, sterility and beauty in each detail</p>
-        <a href="{{ url_for('booking') }}" class="btn-cta-large">Make a prenotation now</a>
+<section class="hero-screen">
+    
+    <div class="hero-visual">
+        <img src="{{ url_for('static', filename='images/woman_flowers.jpeg') }}" alt="Mæle Muse" class="hero-img">
+        <div class="vignette-overlay"></div>
     </div>
-</section>
 
-<section class="latest-works container">
-    <h2>My previous work</h2>
-    <div class="gallery-grid">
-        {% for work in latest_works %}
-        <div class="gallery-item">
-            <img src="{{ url_for('static', filename='images/' + work.image_filename) }}" alt="{{ work.title }}">
+    <div class="hero-content container">
+        
+        <div class="hero-title-wrapper" data-aos="fade-up">
+            <span class="small-tag">Independent Style & Uniqueness</span>
+            <h1 class="main-title">
+                DESIGN <span class="italic-amp">&</span> FREEDOM
+            </h1>
+            <p class="hero-subtitle">
+                Where fashion meets the feeling of you.<br>
+                Explore exclusive designer apparel.
+            </p>
         </div>
-        {% else %}
-        <p>Will be more soon</p>
-        {% endfor %}
+
+        <div class="hero-actions-bar" data-aos="fade-in" data-aos-delay="300">
+            
+            <div class="action-col left">
+                <span class="label">New Season</span>
+                <a href="{{ url_for('gallery') }}" class="action-link">
+                    Discover Collection
+                    <span class="line"></span>
+                </a>
+            </div>
+
+            <div class="action-center">
+                <div class="scroll-indicator"></div>
+            </div>
+
+            <div class="action-col right">
+                <span class="label">Appointments</span>
+                <a href="{{ url_for('profile') }}" class="action-link">
+                    Make a Reservation
+                    <span class="line"></span>
+                </a>
+            </div>
+
+        </div>
     </div>
-    {#<div style="text-align: center; margin-top: 1rem;">
-        <a href="{{ url_for('gallery') }}" class="btn-secondary">Full gallery</a>
-    </div>#}
 </section>
 
+<section class="info-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>150+</h3>
+                <p>Designers</p>
+            </div>
+            <div class="stat-item">
+                <h3>500+</h3>
+                <p>Clients</p>
+            </div>
+            <div class="stat-item">
+                <h3>20k+</h3>
+                <p>Masterpieces</p>
+            </div>
+        </div>
+    </div>
+
+   <div class="marquee-wrapper">
+            <div class="marquee-track scroll-left" style="animation-duration: 60s;">
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+                <span class="brand-item">personal buyer</span><span class="separator">✦</span>
+            </div>
+        </div>
+    
+</section>
 {% endblock %}
