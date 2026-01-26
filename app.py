@@ -7,7 +7,10 @@ from wtforms import StringField, FileField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+
 
 # --- КОНФИГУРАЦИЯ ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -15,8 +18,8 @@ DB_NAME = "maele_fashion.db"
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/images')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'maele_secret_key_999'  # Замените на сложный ключ
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, DB_NAME)}'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'временный-ключ-для-разработки'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///maele_fashion.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -24,6 +27,13 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"], # Общие лимиты для всего сайта
+    storage_uri="memory://"
+)
 
 # --- МОДЕЛИ БАЗЫ ДАННЫХ ---
 class Gallery(db.Model):
@@ -106,7 +116,7 @@ def profile():
 
 # --- АДМИН ПАНЕЛЬ ---
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/secret-management-zone-99', methods=['GET', 'POST'])
 @login_required
 def admin():
     gallery_form = GalleryForm()
@@ -160,6 +170,7 @@ def delete_work(work_id):
     return redirect(url_for('admin'))
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -171,6 +182,7 @@ def login():
     return render_template('login.html', form=form)
 
 @app.route('/logout')
+@limiter.limit("5 per minute")
 def logout():
     logout_user()
     return redirect(url_for('index'))
