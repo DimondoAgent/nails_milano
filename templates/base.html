@@ -30,21 +30,13 @@
 
             <div class="nav-links-wrapper" id="nav-links">
                 <div class="nav-left">
-                    <a href="{{ url_for('profile') }}">О бренде</a>
-                    <a href="{{ url_for('gallery') }}">Коллекции</a>
+                    <a href="{{ url_for('gallery') }}">Collection</a>
+                    <a href="{{ url_for('services') }}">Partners</a>
                 </div>
 
                 <div class="nav-right">
-                    <div class="lang-switcher">
-                        <button class="lang-btn" onclick="triggerTranslate('ru')" id="btn-ru">RU</button>
-                        <span style="color: #444;">|</span>
-                        <button class="lang-btn" onclick="triggerTranslate('en')" id="btn-en">EN</button>
-                        <span style="color: #444;">|</span>
-                        <button class="lang-btn" onclick="triggerTranslate('it')" id="btn-it">IT</button>
-                    </div>
-
-                    <a href="{{ url_for('services') }}">Услуги</a>
-                    <a href="{{ url_for('booking') }}" class="btn-book-nav">Запись</a>
+                    <a href="{{ url_for('profile') }}">About</a>
+                    <a href="{{ url_for('booking') }}" class="btn-book-nav">Reviews</a>
                 </div>
             </div>
         </nav>
