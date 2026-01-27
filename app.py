@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -9,8 +9,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_babel import Babel, gettext as _
 
-
+babel = Babel()
 
 # --- КОНФИГУРАЦИЯ ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,11 +19,12 @@ DB_NAME = "maele_fashion.db"
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/images')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'временный-ключ-для-разработки'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'secret_key_dev_999'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///maele_fashion.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['LANGUAGES'] = ['en', 'ru', 'it']
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -31,7 +33,7 @@ login_manager.login_view = 'login'
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"], # Общие лимиты для всего сайта
+    default_limits=["2000 per day", "500 per hour"],
     storage_uri="memory://"
 )
 
@@ -44,19 +46,6 @@ class Gallery(db.Model):
     size = db.Column(db.String(50), nullable=True)
     image_filename = db.Column(db.String(100), nullable=False)
     is_sold_out = db.Column(db.Boolean, default=False)
-
-class Service(db.Model):
-    # Оставляем модель, чтобы не ломать старые ссылки, даже если она пока пустая
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.Text, nullable=True)
-
-class Appointment(db.Model):
-    # Оставляем для совместимости
-    id = db.Column(db.Integer, primary_key=True)
-    client_name = db.Column(db.String(100))
-    start_datetime = db.Column(db.DateTime)
 
 class Admin(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,6 +61,10 @@ class Admin(UserMixin, db.Model):
 def load_user(user_id):
     return db.session.get(Admin, int(user_id))
 
+def get_locale():
+    return session.get('lang', 'ru')
+babel.init_app(app, locale_selector=get_locale)
+
 # --- ФОРМЫ ---
 class LoginForm(FlaskForm):
     username = StringField("Логин", validators=[DataRequired()])
@@ -79,55 +72,50 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Войти")
 
 class GalleryForm(FlaskForm):
-    brand = StringField("Бренд", validators=[DataRequired()], render_kw={"placeholder": "Например: Chanel"})
-    title = StringField("Название", validators=[DataRequired()], render_kw={"placeholder": "Сумочка Classic Flap"})
-    price = StringField("Цена", render_kw={"placeholder": "€4500"})
-    size = StringField("Размер", render_kw={"placeholder": "38 / M"})
+    brand = StringField("Бренд", validators=[DataRequired()])
+    title = StringField("Название", validators=[DataRequired()])
+    price = StringField("Цена")
+    size = StringField("Размер")
     image = FileField("Фото", validators=[DataRequired()])
-    submit_gallery = SubmitField("Добавить в каталог")
+    submit_gallery = SubmitField("Добавить")
 
-# --- МАРШРУТЫ (ROUTES) ---
-
+# --- МАРШРУТЫ ---
 @app.route('/')
 def index():
-    # Главная: только активные товары
     latest_works = Gallery.query.filter_by(is_sold_out=False).order_by(Gallery.id.desc()).limit(6).all()
     return render_template('index.html', latest_works=latest_works)
 
 @app.route('/gallery')
 def gallery():
-    # Каталог: сначала активные, потом проданные
     all_works = Gallery.query.order_by(Gallery.is_sold_out.asc(), Gallery.id.desc()).all()
     return render_template('gallery.html', works=all_works)
 
 @app.route('/services')
 def services():
-    # Заглушка, чтобы не было ошибки BuildError
-    return render_template('services.html', services=[])
+    return render_template('services.html')
 
 @app.route('/booking')
 def booking():
-    # Заглушка
-    return render_template('booking.html', services=[])
+    return render_template('booking.html')
 
 @app.route('/profile')
 def profile():
     return render_template('profile.html')
 
-# --- АДМИН ПАНЕЛЬ ---
+@app.context_processor
+def inject_gettext():
+    return dict(_=_)
 
+# --- АДМИН ПАНЕЛЬ ---
 @app.route('/secret-management-zone-99', methods=['GET', 'POST'])
 @login_required
 def admin():
     gallery_form = GalleryForm()
-    
     if gallery_form.validate_on_submit():
         file = gallery_form.image.data
         filename = secure_filename(file.filename)
-        
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
             os.makedirs(app.config['UPLOAD_FOLDER'])
-            
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_item = Gallery(
@@ -140,7 +128,6 @@ def admin():
         )
         db.session.add(new_item)
         db.session.commit()
-        flash("Товар успешно добавлен!", "success")
         return redirect(url_for('admin'))
 
     all_works = Gallery.query.order_by(Gallery.id.desc()).all()
@@ -166,11 +153,9 @@ def delete_work(work_id):
             pass
         db.session.delete(item)
         db.session.commit()
-        flash("Товар удален", "warning")
     return redirect(url_for('admin'))
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("5 per minute")
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -178,23 +163,23 @@ def login():
         if admin and admin.check_password(form.password.data):
             login_user(admin)
             return redirect(url_for('admin'))
-        flash("Неверный логин или пароль", "error")
+        flash("Ошибка входа", "error")
     return render_template('login.html', form=form)
 
 @app.route('/logout')
-@limiter.limit("5 per minute")
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
+# --- ЗАПУСК ---
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        # Автосоздание админа, если его нет
         if not Admin.query.first():
             admin = Admin(username='admin')
-            admin.set_password('admin123') # Пароль по умолчанию
+            admin.set_password('admin123')
             db.session.add(admin)
             db.session.commit()
-            print("Админ создан: admin / admin123")
-    app.run(debug=True)
+            print("--- Admin Created: admin / admin123 ---")
+    
+    app.run(host="0.0.0.0", port=5001, debug=True)

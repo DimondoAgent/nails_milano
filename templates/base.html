@@ -14,44 +14,152 @@
 </head>
 <body>
 
+    <div class="page-transition-curtain" id="pageCurtain"></div>
+
+    <div id="google_translate_element"></div>
+
     <header class="header">
         <nav class="navbar container">
-            <div class="nav-left">
-                <a href="{{ url_for('gallery') }}">Collections</a>
-                <a href="{{ url_for('services') }}">Designers</a>
+            <a href="{{ url_for('index') }}" class="nav-logo">MÆLE SOURCE</a>
+            
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
 
-            <a href="{{ url_for('index') }}" class="nav-logo">MÆLE SOURCE</a>
+            <div class="nav-links-wrapper" id="nav-links">
+                <div class="nav-left">
+                    <a href="{{ url_for('profile') }}">О бренде</a>
+                    <a href="{{ url_for('gallery') }}">Коллекции</a>
+                </div>
 
-            <div class="nav-right">
-                <a href="{{ url_for('profile') }}">About</a>
-                <a href="{{ url_for('booking') }}">Reviews</a>
+                <div class="nav-right">
+                    <div class="lang-switcher">
+                        <button class="lang-btn" onclick="triggerTranslate('ru')" id="btn-ru">RU</button>
+                        <span style="color: #444;">|</span>
+                        <button class="lang-btn" onclick="triggerTranslate('en')" id="btn-en">EN</button>
+                        <span style="color: #444;">|</span>
+                        <button class="lang-btn" onclick="triggerTranslate('it')" id="btn-it">IT</button>
+                    </div>
+
+                    <a href="{{ url_for('services') }}">Услуги</a>
+                    <a href="{{ url_for('booking') }}" class="btn-book-nav">Запись</a>
+                </div>
             </div>
         </nav>
     </header>
 
-    <main class="page-content">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-wrapper">
-                    {% for category, message in messages %}
-                        <div class="flash-message {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
+    <main id="mainContent" class="fade-up-enter">
         {% block content %}{% endblock %}
     </main>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({
-            duration: 1200,
-            once: true,
-            offset: 50
+      AOS.init({
+            duration: 600,
+            once: true
         });
     </script>
-    {% block scripts %}{% endblock %}
+
+    <script>
+        /* =========================================
+           СКРИПТ ПЛАВНЫХ ПЕРЕХОДОВ
+           ========================================= */
+        document.addEventListener('DOMContentLoaded', () => {
+            const curtain = document.getElementById('pageCurtain');
+            
+            // 1. Плавное появление (Fade In) при загрузке страницы
+            // Небольшая задержка (100мс), чтобы браузер успел отрисовать начало
+            setTimeout(() => {
+                curtain.classList.add('loaded'); 
+            }, 100);
+
+            // 2. Плавный уход (Fade Out) при клике на ссылки
+            const links = document.querySelectorAll('a');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const target = this.getAttribute('href');
+                    
+                    // Проверяем, что ссылка внутренняя (не на другой сайт) и не "якорь" (#)
+                    if (target && target.startsWith('/') && !target.startsWith('#')) {
+                        e.preventDefault(); // Останавливаем мгновенный переход
+                        
+                        // Возвращаем черную шторку (Fade Out)
+                        curtain.classList.remove('loaded');
+
+                        // Ждем пока анимация пройдет (800мс как в CSS), потом переходим
+                        setTimeout(() => {
+                            window.location.href = target;
+                        }, 800);
+                    }
+                });
+            });
+
+            // Логика Бургер-меню
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+            const menuLinks = document.querySelectorAll('.nav-links-wrapper a');
+
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    navLinks.classList.toggle('active');
+                    document.body.classList.toggle('no-scroll');
+                });
+
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                        document.body.classList.remove('no-scroll');
+                    });
+                });
+            }
+        });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'ru',
+                includedLanguages: 'en,it,ru',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function triggerTranslate(langCode) {
+            var select = document.querySelector('select.goog-te-combo');
+            if (select) {
+                select.value = langCode;
+                select.dispatchEvent(new Event('change'));
+            }
+        }
+
+        /* Логика Google Translate (из прошлого шага) */
+        function googleTranslateElementInit() {
+          new google.translate.TranslateElement(
+            {pageLanguage: 'ru', includedLanguages: 'ru,en,it', autoDisplay: false},
+            'google_translate_element'
+          );
+        }
+        function triggerTranslate(langCode) {
+            const googleSelect = document.querySelector(".goog-te-combo");
+            if (googleSelect) {
+                googleSelect.value = langCode;
+                googleSelect.dispatchEvent(new Event("change"));
+                updateActiveLangButton(langCode);
+            }
+        }
+        function updateActiveLangButton(langCode) {
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + langCode);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        window.addEventListener('load', function() {
+            setTimeout(() => { updateActiveLangButton('ru'); }, 1000);
+        });
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

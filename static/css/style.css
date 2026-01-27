@@ -37,7 +37,37 @@ a { text-decoration: none; color: inherit; transition: 0.3s; }
 }
 
 /* ======================================= 
-   2. HEADER (ПРОЗРАЧНЫЙ И СИММЕТРИЧНЫЙ)
+   SOFT PAGE LOAD (Плавное появление текста)
+======================================= */
+
+/* Начальное состояние контента: прозрачный и чуть смещен вниз */
+.fade-in-content {
+    opacity: 0;
+    transform: translateY(5px); /* Совсем легкое движение для естественности */
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    will-change: opacity, transform;
+}
+
+/* Состояние после загрузки */
+.fade-in-content.visible {
+    opacity: 1.0;
+    transform: translateY(0);
+}
+
+/* Убираем резкие скачки у картинок */
+img {
+    transition: opacity 0.5s ease-in;
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ======================================= 
+   2. HEADER (DESKTOP)
 ======================================= */
 .header {
     position: absolute;
@@ -52,51 +82,44 @@ a { text-decoration: none; color: inherit; transition: 0.3s; }
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative; /* Для позиционирования лого */
+}
+
+/* Обертка для всех ссылок на ПК */
+.nav-links-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .nav-left, .nav-right {
     display: flex;
     gap: 40px;
-    flex: 1; /* Равномерное распределение */
+    align-items: center;
 }
 
-.nav-right {
-    justify-content: flex-end;
-}
-
+/* Логотип по центру */
 .nav-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: var(--font-serif);
     font-size: 1.8rem;
     letter-spacing: 2px;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-white);
-    margin: 0 20px;
-    white-space: nowrap; /* Чтобы лого не ломалось */
+    white-space: nowrap;
+    z-index: 1002; /* Поверх всего */
 }
 
-.navbar a {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-grey);
-    font-weight: 500;
+.hamburger {
+    display: none; /* Скрыт на ПК */
 }
 
-.navbar a:hover {
-    color: var(--text-white);
-}
-
-.btn-book-nav {
-    border: 1px solid rgba(255,255,255, 0.3);
-    padding: 8px 24px;
-    border-radius: 50px;
-}
-
-.btn-book-nav:hover {
-    background: var(--text-white);
-    color: var(--bg-dark);
-    border-color: var(--text-white);
+.no-scroll {
+    overflow: hidden; /* Блокировка скролла при открытом меню */
 }
 
 /* ======================================= 
@@ -950,5 +973,184 @@ a { text-decoration: none; color: inherit; transition: 0.3s; }
 @media (max-width: 768px) {
     .admin-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ======================================= 
+   7. ADAPTIVE (MOBILE)
+======================================= */
+@media (max-width: 1024px) {
+    .container { padding: 0 30px; }
+    .nav-left, .nav-right { gap: 20px; }
+}
+
+@media (max-width: 768px) {
+    /* 1. Хедер и Лого */
+    .header { padding: 20px 0; }
+    
+    .nav-logo {
+        position: relative; /* Возвращаем в поток */
+        left: auto;
+        transform: none;
+        font-size: 1.4rem;
+    }
+
+    /* 2. Бургер */
+    .hamburger {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 20px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .hamburger span {
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: var(--text-white);
+        transition: 0.3s;
+    }
+
+    /* Анимация крестика */
+    .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+    /* 3. Мобильное меню (Шторка) */
+    .nav-links-wrapper {
+        position: fixed;
+        top: 0;
+        right: -100%; /* Спрятано */
+        width: 100%;
+        height: 100vh;
+        background: var(--bg-dark);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        transition: 0.5s cubic-bezier(0.77, 0.2, 0.05, 1);
+        z-index: 1000;
+        padding-top: 60px; /* Отступ сверху */
+    }
+
+    .nav-links-wrapper.active {
+        right: 0; /* Выезжает */
+    }
+
+    .nav-left, .nav-right {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .nav-links-wrapper a {
+        font-size: 1.5rem;
+        color: var(--text-white);
+    }
+}
+
+/* ======================================= 
+   GOOGLE TRANSLATE CUSTOMIZATION
+======================================= */
+
+/* 1. Скрываем стандартную панель Google и сдвиг тела страницы */
+body {
+    top: 0 !important;
+}
+
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+.goog-te-gadget-icon {
+    display: none !important;
+}
+
+.goog-te-gadget-simple {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 0 !important; /* Скрываем текст "Powered by..." */
+}
+
+/* Скрываем сам контейнер, но оставляем его в DOM для работы скрипта */
+#google_translate_element {
+    display: none; 
+    visibility: hidden;
+}
+
+/* Прячем тултипы при наведении на текст */
+.goog-text-highlight {
+    background: none !important;
+    box-shadow: none !important;
+}
+
+/* 2. Стили нашего кастомного переключателя */
+.lang-switcher {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-right: 10px; /* Отступ от кнопки Book */
+}
+
+.lang-btn {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--text-grey);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.lang-btn:hover,
+.lang-btn.active {
+    color: var(--brand-burgundy); /* Твой акцентный цвет */
+    font-weight: 600;
+}
+
+/* Для мобилки */
+@media (max-width: 768px) {
+    /* Исправляем главный заголовок, чтобы он не вылезал за края */
+    .main-title {
+        font-size: 3rem !important; /* Уменьшаем размер */
+        line-height: 1.1;
+        word-wrap: break-word;
+    }
+
+    /* Исправляем наложение контента в Hero секции */
+    .hero-screen {
+        height: auto;
+        min-height: 100vh;
+        padding: 100px 0 50px; /* Даем место сверху для хедера */
+    }
+
+    .hero-content {
+        padding-top: 20px;
+        justify-content: flex-start;
+    }
+
+    /* Нижняя панель на мобилках должна быть в колонку */
+    .hero-actions-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        padding-bottom: 40px;
+    }
+
+    .action-col, .action-col.right {
+        text-align: center;
+        width: 100%;
+    }
+
+    .action-center {
+        display: none; /* Убираем разделительную линию на мобилках */
     }
 }
