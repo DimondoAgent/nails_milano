@@ -19,7 +19,7 @@ DB_NAME = "maele_fashion.db"
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/images')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'secret_key_dev_999'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///maele_fashion.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -182,5 +182,4 @@ if __name__ == "__main__":
             db.session.add(admin)
             db.session.commit()
             print("--- Admin Created: admin / admin123 ---")
-    
-    app.run(host="0.0.0.0", port=5001, debug=True)
+        app.run(host="0.0.0.0", port=5001, debug=True)
