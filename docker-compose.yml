@@ -1,0 +1,27 @@
+services:
+  nails_milano:
+    build: .
+    container_name: nails_milano
+    restart: unless-stopped
+    user: root
+
+    env_file:
+      - .env
+
+    ports:
+      - "5001:5001"
+
+    volumes:
+      - ./data:/app/data
+      - ./static/images:/app/static/images
+
+    command: >
+      sh -c "chown -R appuser:appuser /app/data /app/static/images &&
+             su appuser -s /bin/sh -c 'gunicorn --bind 0.0.0.0:5001 --workers 2 --timeout 120 --no-sendfile --access-logfile - --error-logfile - wsgi:app'"
+
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

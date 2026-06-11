@@ -7,21 +7,84 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     {% block head %}{% endblock %}
+
+    <style>
+        /* =============================================
+           ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
+           Быстрое появление/уход — 250мс, без зависания
+        ============================================= */
+        #pageCurtain {
+            position: fixed;
+            inset: 0;
+            background: #0a0a0a;
+            z-index: 9999;
+            opacity: 1;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        #pageCurtain.loaded {
+            opacity: 0;
+        }
+
+        /* =============================================
+           ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ EN / RU
+        ============================================= */
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 20px;
+            padding: 3px;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .lang-pill {
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: #888;
+            background: transparent;
+            border: none;
+            padding: 5px 11px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .lang-pill.active {
+            background: #ffffff;
+            color: #0a0a0a;
+        }
+        .lang-pill:hover:not(.active) {
+            color: #ffffff;
+        }
+
+        /* Скрываем стандартную панель Google Translate */
+        body { top: 0 !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        .goog-te-gadget-icon { display: none !important; }
+        .goog-text-highlight { background: none !important; box-shadow: none !important; }
+        #google_translate_element { display: none; visibility: hidden; }
+    </style>
 </head>
 <body>
 
-    <div class="page-transition-curtain" id="pageCurtain"></div>
+    <!-- Шторка перехода между страницами -->
+    <div id="pageCurtain"></div>
 
+    <!-- Google Translate скрытый контейнер -->
     <div id="google_translate_element"></div>
 
     <header class="header">
         <nav class="navbar container">
             <a href="{{ url_for('index') }}" class="nav-logo">MÆLE SOURCE</a>
-            
+
             <div class="hamburger" id="hamburger">
                 <span></span>
                 <span></span>
@@ -37,121 +100,150 @@
                 <div class="nav-right">
                     <a href="{{ url_for('profile') }}">About</a>
                     <a href="{{ url_for('booking') }}" class="btn-book-nav">Reviews</a>
+
+                    <!-- Переключатель языков -->
+                    <div class="lang-toggle">
+                        <button class="lang-pill" id="pill-en" onclick="setLang('en')">EN</button>
+                        <button class="lang-pill" id="pill-ru" onclick="setLang('ru')">RU</button>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main id="mainContent" class="fade-up-enter">
+    <main id="mainContent">
         {% block content %}{% endblock %}
     </main>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-      AOS.init({
-            duration: 600,
-            once: true
-        });
+        AOS.init({ duration: 600, once: true });
     </script>
 
     <script>
-        /* =========================================
-           СКРИПТ ПЛАВНЫХ ПЕРЕХОДОВ
-           ========================================= */
-        document.addEventListener('DOMContentLoaded', () => {
+        /* =============================================
+           ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
+           Шторка исчезает при загрузке (250мс),
+           появляется мгновенно при уходе (50мс навигация)
+        ============================================= */
+        (function () {
             const curtain = document.getElementById('pageCurtain');
-            
-            // 1. Плавное появление (Fade In) при загрузке страницы
-            // Небольшая задержка (100мс), чтобы браузер успел отрисовать начало
-            setTimeout(() => {
-                curtain.classList.add('loaded'); 
-            }, 100);
 
-            // 2. Плавный уход (Fade Out) при клике на ссылки
-            const links = document.querySelectorAll('a');
-            
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const target = this.getAttribute('href');
-                    
-                    // Проверяем, что ссылка внутренняя (не на другой сайт) и не "якорь" (#)
-                    if (target && target.startsWith('/') && !target.startsWith('#')) {
-                        e.preventDefault(); // Останавливаем мгновенный переход
-                        
-                        // Возвращаем черную шторку (Fade Out)
-                        curtain.classList.remove('loaded');
-
-                        // Ждем пока анимация пройдет (800мс как в CSS), потом переходим
-                        setTimeout(() => {
-                            window.location.href = target;
-                        }, 800);
-                    }
+            // Страница загружена — плавно убираем шторку
+            window.addEventListener('DOMContentLoaded', () => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        curtain.classList.add('loaded');
+                    });
                 });
             });
 
-            // Логика Бургер-меню
-            const hamburger = document.getElementById('hamburger');
-            const navLinks = document.getElementById('nav-links');
-            const menuLinks = document.querySelectorAll('.nav-links-wrapper a');
+            // Клик по внутренней ссылке — мгновенная шторка, затем переход
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link) return;
 
-            if (hamburger && navLinks) {
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    navLinks.classList.toggle('active');
-                    document.body.classList.toggle('no-scroll');
-                });
+                const href = link.getAttribute('href');
+                if (!href || !href.startsWith('/') || href.startsWith('//')) return;
+                if (href.includes('logout')) return;
 
-                menuLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburger.classList.remove('active');
-                        navLinks.classList.remove('active');
-                        document.body.classList.remove('no-scroll');
-                    });
-                });
+                e.preventDefault();
+
+                // Убираем анимацию появления — шторка появляется мгновенно
+                curtain.style.transition = 'none';
+                curtain.classList.remove('loaded');
+
+                // Минимальная задержка чтобы браузер успел отрисовать шторку
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 50);
+            });
+        })();
+
+
+        /* =============================================
+           ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ
+           EN — сбрасываем перевод (удаляем GT cookie)
+           RU — запускаем Google Translate → Russian
+        ============================================= */
+        function setLang(lang) {
+            localStorage.setItem('siteLang', lang);
+            updateLangUI(lang);
+
+            if (lang === 'ru') {
+                triggerGT('ru');
+            } else {
+                resetTranslation();
             }
-        });
-
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'ru',
-                includedLanguages: 'en,it,ru',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
         }
 
-        function triggerTranslate(langCode) {
-            var select = document.querySelector('select.goog-te-combo');
+        function updateLangUI(lang) {
+            document.getElementById('pill-en').classList.toggle('active', lang === 'en');
+            document.getElementById('pill-ru').classList.toggle('active', lang === 'ru');
+        }
+
+        function triggerGT(langCode) {
+            const select = document.querySelector('select.goog-te-combo');
             if (select) {
                 select.value = langCode;
                 select.dispatchEvent(new Event('change'));
+            } else {
+                // GT ещё не инициализировался — повторяем через 300мс
+                setTimeout(() => triggerGT(langCode), 300);
             }
         }
 
-        /* Логика Google Translate (из прошлого шага) */
+        function resetTranslation() {
+            // Удаляем cookie Google Translate и перезагружаем без перевода
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
+            window.location.reload();
+        }
+
+        // Google Translate инициализация (один раз — без дубликатов)
         function googleTranslateElementInit() {
-          new google.translate.TranslateElement(
-            {pageLanguage: 'ru', includedLanguages: 'ru,en,it', autoDisplay: false},
-            'google_translate_element'
-          );
+            new google.translate.TranslateElement(
+                { pageLanguage: 'en', includedLanguages: 'en,ru', autoDisplay: false },
+                'google_translate_element'
+            );
         }
-        function triggerTranslate(langCode) {
-            const googleSelect = document.querySelector(".goog-te-combo");
-            if (googleSelect) {
-                googleSelect.value = langCode;
-                googleSelect.dispatchEvent(new Event("change"));
-                updateActiveLangButton(langCode);
+
+        // При загрузке — восстанавливаем сохранённый язык
+        window.addEventListener('load', function () {
+            const saved = localStorage.getItem('siteLang') || 'en';
+            updateLangUI(saved);
+            if (saved === 'ru') {
+                setTimeout(() => triggerGT('ru'), 800);
             }
-        }
-        function updateActiveLangButton(langCode) {
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById('btn-' + langCode);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-        window.addEventListener('load', function() {
-            setTimeout(() => { updateActiveLangButton('ru'); }, 1000);
         });
+
+
+        /* =============================================
+           БУРГЕР-МЕНЮ
+        ============================================= */
+        (function () {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks  = document.getElementById('nav-links');
+            const menuLinks = document.querySelectorAll('.nav-links-wrapper a');
+
+            if (!hamburger || !navLinks) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                document.body.classList.toggle('no-scroll');
+            });
+
+            menuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    document.body.classList.remove('no-scroll');
+                });
+            });
+        })();
     </script>
+
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

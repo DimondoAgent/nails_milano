@@ -824,7 +824,7 @@ img {
 .admin-container {
     max-width: 1200px;
     margin: 40px auto;
-    padding: 0 20px;
+    padding: 120px 20px 0;
     font-family: 'Helvetica Neue', sans-serif;
 }
 

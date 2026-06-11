@@ -1,0 +1,39 @@
+
+Copy
+
+# База данных — не нужна внутри образа, монтируется как volume
+*.db
+*.sqlite
+*.sqlite3
+data/
+ 
+# Загруженные фото — тоже монтируются как volume
+
+ 
+# Python кеш
+__pycache__/
+*.py[cod]
+*.pyo
+ 
+# Виртуальное окружение
+venv/
+.venv/
+env/
+ 
+# Секреты — никогда в образ
+.env
+ 
+# Git
+.git/
+.gitignore
+ 
+# IDE
+.idea/
+.vscode/
+ 
+# macOS
+.DS_Store
+ 
+# Документация
+*.md
+ 

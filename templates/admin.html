@@ -80,6 +80,7 @@
                             </td>
                             <td>
                                 <form action="{{ url_for('toggle_status', work_id=item.id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     {% if item.is_sold_out %}
                                         <button type="submit" class="status-btn sold">SOLD OUT</button>
                                     {% else %}
@@ -89,6 +90,7 @@
                             </td>
                             <td>
                                 <form action="{{ url_for('delete_work', work_id=item.id) }}" method="POST" onsubmit="return confirm('Удалить этот товар?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <button type="submit" class="btn-delete">×</button>
                                 </form>
                             </td>
