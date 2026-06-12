@@ -254,7 +254,7 @@ def init_db():
     os.makedirs(data_dir, exist_ok=True)
 
     with app.app_context():
-        db.create_all(checkfirst=True)
+        db.create_all()
         if not Admin.query.first():
             admin_user = os.environ.get('ADMIN_USERNAME')
             admin_pass = os.environ.get('ADMIN_PASSWORD')
