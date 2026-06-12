@@ -148,14 +148,10 @@
                 if (href.includes('logout')) return;
 
                 e.preventDefault();
-
-                // Убираем анимацию появления — шторка появляется мгновенно
                 curtain.style.transition = 'none';
                 curtain.classList.remove('loaded');
-
-                // Минимальная задержка чтобы браузер успел отрисовать шторку
                 setTimeout(() => {
-                    window.location.href = href;
+                    window.location.assign(href);
                 }, 50);
             });
         })();
