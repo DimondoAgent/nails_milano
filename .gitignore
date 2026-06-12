@@ -25,7 +25,19 @@ env/
 data/
 
 # Загруженные пользователями файлы
-static/images/
+# Загруженные пользователями файлы (товары из админки)
+static/images/uploads/
+
+# НО отслеживаем статичные картинки сайта
+!static/images/woman_flowers.jpeg
+!static/images/herm.jpg
+!static/images/cart.jpg
+!static/images/ilm.png
+!static/images/par.jpg
+!static/images/portfolio.jpg
+!static/images/photo_2025-10-22_11-28-39.jpg
+!static/images/photo_2025-12-20_21-09-05.jpg
+!static/images/original_5d5d700467cd9302f61f1858_5d5d70990a995.jpg
 
 # IDE
 .idea/
