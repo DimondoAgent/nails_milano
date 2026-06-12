@@ -12,6 +12,16 @@
     {% block head %}{% endblock %}
 
     <style>
+        /* Плавный fade через opacity на body — не блокирует навигацию */
+        body {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
         .lang-toggle {
             display: flex;
             align-items: center;
@@ -88,6 +98,29 @@
     </script>
 
     <script>
+        // =============================================
+        // ПЛАВНЫЙ ПЕРЕХОД — fade out перед уходом
+        // =============================================
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (!link) return;
+
+            const href = link.getAttribute('href');
+            if (!href || !href.startsWith('/') || href.startsWith('//')) return;
+            if (href.includes('logout')) return;
+
+            e.preventDefault();
+
+            // Плавно скрываем страницу
+            document.body.style.transition = 'opacity 0.2s ease';
+            document.body.style.opacity = '0';
+
+            setTimeout(() => {
+                window.location.href = href;
+            }, 200);
+        });
+
+
         // =============================================
         // ПЕРЕВОДЫ
         // =============================================
