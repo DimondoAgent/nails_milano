@@ -12,19 +12,6 @@
     {% block head %}{% endblock %}
 
     <style>
-        #pageCurtain {
-            position: fixed;
-            inset: 0;
-            background: #0a0a0a;
-            z-index: 9999;
-            opacity: 1;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-        #pageCurtain.loaded {
-            opacity: 0;
-        }
-
         .lang-toggle {
             display: flex;
             align-items: center;
@@ -60,8 +47,6 @@
     </style>
 </head>
 <body>
-
-    <div id="pageCurtain"></div>
 
     <header class="header">
         <nav class="navbar container">
@@ -153,50 +138,6 @@
             applyTranslations(saved);
             updateLangUI(saved);
         });
-
-
-        // =============================================
-        // ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ + КНОПКА НАЗАД
-        // =============================================
-        (function () {
-            const curtain = document.getElementById('pageCurtain');
-
-            // Убираем шторку при загрузке
-            window.addEventListener('DOMContentLoaded', () => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        curtain.classList.add('loaded');
-                    });
-                });
-            });
-
-            // Клик по внутренней ссылке
-            document.addEventListener('click', (e) => {
-                const link = e.target.closest('a');
-                if (!link) return;
-
-                const href = link.getAttribute('href');
-                if (!href || !href.startsWith('/') || href.startsWith('//')) return;
-                if (href.includes('logout')) return;
-
-                e.preventDefault();
-
-                curtain.style.transition = 'opacity 0.15s ease';
-                curtain.classList.remove('loaded');
-
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 150);
-            });
-
-            // Кнопка назад/вперёд в браузере
-            window.addEventListener('pageshow', (e) => {
-                if (e.persisted) {
-                    curtain.style.transition = 'none';
-                    curtain.classList.add('loaded');
-                }
-            });
-        })();
 
 
         // =============================================
