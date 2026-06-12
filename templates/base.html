@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,10 +12,6 @@
     {% block head %}{% endblock %}
 
     <style>
-        /* =============================================
-           ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
-           Быстрое появление/уход — 250мс, без зависания
-        ============================================= */
         #pageCurtain {
             position: fixed;
             inset: 0;
@@ -29,9 +25,6 @@
             opacity: 0;
         }
 
-        /* =============================================
-           ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ EN / RU
-        ============================================= */
         .lang-toggle {
             display: flex;
             align-items: center;
@@ -64,22 +57,11 @@
         .lang-pill:hover:not(.active) {
             color: #ffffff;
         }
-
-        /* Скрываем стандартную панель Google Translate */
-        body { top: 0 !important; }
-        .goog-te-banner-frame.skiptranslate { display: none !important; }
-        .goog-te-gadget-icon { display: none !important; }
-        .goog-text-highlight { background: none !important; box-shadow: none !important; }
-        #google_translate_element { display: none; visibility: hidden; }
     </style>
 </head>
 <body>
 
-    <!-- Шторка перехода между страницами -->
     <div id="pageCurtain"></div>
-
-    <!-- Google Translate скрытый контейнер -->
-    <div id="google_translate_element"></div>
 
     <header class="header">
         <nav class="navbar container">
@@ -93,18 +75,18 @@
 
             <div class="nav-links-wrapper" id="nav-links">
                 <div class="nav-left">
-                    <a href="{{ url_for('gallery') }}">Collection</a>
-                    <a href="{{ url_for('services') }}">Partners</a>
+                    <a href="{{ url_for('gallery') }}" data-i18n="nav_collection">Collection</a>
+                    <a href="{{ url_for('services') }}" data-i18n="nav_partners">Partners</a>
                 </div>
 
                 <div class="nav-right">
-                    <a href="{{ url_for('profile') }}">About</a>
-                    <a href="{{ url_for('booking') }}" class="btn-book-nav">Reviews</a>
+                    <a href="{{ url_for('profile') }}" data-i18n="nav_about">About</a>
+                    <a href="{{ url_for('booking') }}" class="btn-book-nav" data-i18n="nav_reviews">Reviews</a>
 
-                    <!-- Переключатель языков -->
                     <div class="lang-toggle">
                         <button class="lang-pill" id="pill-en" onclick="setLang('en')">EN</button>
                         <button class="lang-pill" id="pill-ru" onclick="setLang('ru')">RU</button>
+                        <button class="lang-pill" id="pill-it" onclick="setLang('it')">IT</button>
                     </div>
                 </div>
             </div>
@@ -121,15 +103,65 @@
     </script>
 
     <script>
-        /* =============================================
-           ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
-           Шторка исчезает при загрузке (250мс),
-           появляется мгновенно при уходе (50мс навигация)
-        ============================================= */
+        // =============================================
+        // ПЕРЕВОДЫ
+        // =============================================
+        const TRANSLATIONS = {
+            en: {
+                nav_collection: 'Collection',
+                nav_partners: 'Partners',
+                nav_about: 'About',
+                nav_reviews: 'Reviews',
+            },
+            ru: {
+                nav_collection: 'Коллекция',
+                nav_partners: 'Партнёры',
+                nav_about: 'О нас',
+                nav_reviews: 'Отзывы',
+            },
+            it: {
+                nav_collection: 'Collezione',
+                nav_partners: 'Partner',
+                nav_about: 'Chi siamo',
+                nav_reviews: 'Recensioni',
+            }
+        };
+
+        function setLang(lang) {
+            localStorage.setItem('siteLang', lang);
+            applyTranslations(lang);
+            updateLangUI(lang);
+        }
+
+        function applyTranslations(lang) {
+            const t = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+        }
+
+        function updateLangUI(lang) {
+            ['en', 'ru', 'it'].forEach(l => {
+                const pill = document.getElementById('pill-' + l);
+                if (pill) pill.classList.toggle('active', l === lang);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('siteLang') || 'en';
+            applyTranslations(saved);
+            updateLangUI(saved);
+        });
+
+
+        // =============================================
+        // ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ + КНОПКА НАЗАД
+        // =============================================
         (function () {
             const curtain = document.getElementById('pageCurtain');
 
-            // Страница загружена — плавно убираем шторку
+            // Убираем шторку при загрузке
             window.addEventListener('DOMContentLoaded', () => {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
@@ -138,7 +170,7 @@
                 });
             });
 
-            // Клик по внутренней ссылке — мгновенная шторка, затем переход
+            // Клик по внутренней ссылке
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('a');
                 if (!link) return;
@@ -149,77 +181,27 @@
 
                 e.preventDefault();
 
-                curtain.style.transition = 'none';
+                curtain.style.transition = 'opacity 0.15s ease';
                 curtain.classList.remove('loaded');
 
                 setTimeout(() => {
-                    history.pushState(null, '', href);
                     window.location.href = href;
-                }, 50);
+                }, 150);
+            });
+
+            // Кнопка назад/вперёд в браузере
+            window.addEventListener('pageshow', (e) => {
+                if (e.persisted) {
+                    curtain.style.transition = 'none';
+                    curtain.classList.add('loaded');
+                }
             });
         })();
 
 
-        /* =============================================
-           ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ
-           EN — сбрасываем перевод (удаляем GT cookie)
-           RU — запускаем Google Translate → Russian
-        ============================================= */
-        function setLang(lang) {
-            localStorage.setItem('siteLang', lang);
-            updateLangUI(lang);
-
-            if (lang === 'ru') {
-                triggerGT('ru');
-            } else {
-                resetTranslation();
-            }
-        }
-
-        function updateLangUI(lang) {
-            document.getElementById('pill-en').classList.toggle('active', lang === 'en');
-            document.getElementById('pill-ru').classList.toggle('active', lang === 'ru');
-        }
-
-        function triggerGT(langCode) {
-            const select = document.querySelector('select.goog-te-combo');
-            if (select) {
-                select.value = langCode;
-                select.dispatchEvent(new Event('change'));
-            } else {
-                // GT ещё не инициализировался — повторяем через 300мс
-                setTimeout(() => triggerGT(langCode), 300);
-            }
-        }
-
-        function resetTranslation() {
-            // Удаляем cookie Google Translate и перезагружаем без перевода
-            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
-            window.location.reload();
-        }
-
-        // Google Translate инициализация (один раз — без дубликатов)
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement(
-                { pageLanguage: 'en', includedLanguages: 'en,ru', autoDisplay: false },
-                'google_translate_element'
-            );
-        }
-
-        // При загрузке — восстанавливаем сохранённый язык
-        window.addEventListener('load', function () {
-            const saved = localStorage.getItem('siteLang') || 'en';
-            updateLangUI(saved);
-            if (saved === 'ru') {
-                setTimeout(() => triggerGT('ru'), 800);
-            }
-        });
-
-
-        /* =============================================
-           БУРГЕР-МЕНЮ
-        ============================================= */
+        // =============================================
+        // БУРГЕР-МЕНЮ
+        // =============================================
         (function () {
             const hamburger = document.getElementById('hamburger');
             const navLinks  = document.getElementById('nav-links');
@@ -243,6 +225,5 @@
         })();
     </script>
 
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
