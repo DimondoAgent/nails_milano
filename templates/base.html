@@ -148,10 +148,13 @@
                 if (href.includes('logout')) return;
 
                 e.preventDefault();
+
                 curtain.style.transition = 'none';
                 curtain.classList.remove('loaded');
+
                 setTimeout(() => {
-                    window.location.assign(href);
+                    history.pushState(null, '', href);
+                    window.location.href = href;
                 }, 50);
             });
         })();
